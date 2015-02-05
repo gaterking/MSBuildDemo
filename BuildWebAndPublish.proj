@@ -1,0 +1,43 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildProjects">
+    <PropertyGroup>
+        <ProjectFullName></ProjectFullName>
+        <Configuration Condition="$(Configuration)==''">Release</Configuration>
+        <Platform Condition="$(Platform)==''">Any CPU</Platform>
+        <!-- Location for build output of the project -->
+        <OutputRoot Condition="$(OutputRoot)==''">$(MSBuildThisFileDirectory)BuildOutput\</OutputRoot>
+        <!-- Root for the publish output -->
+        <PublishFolder Condition="$(PublishFolder)==''">$(MSBuildThisFileDirectory)PublishFolder\</PublishFolder>
+    </PropertyGroup>
+    <ItemGroup>
+    <ProjectsToBuild Include="$(MSBuildThisFileDirectory)$(ProjectFullName)">
+      <AdditionalProperties>
+        <!--VisualStudioVersion=$(VisualStudioVersion);-->
+        Configuration=$(Configuration);
+        OutputPath=$(OutputRoot);
+        WebPublishMethod=FileSystem;
+        publishUrl=$(PublishFolder);
+        DeployOnBuild=true;
+        DeployTarget=WebPublish;
+        PublishProfile=$(MSBuildThisFileFullPath)
+      </AdditionalProperties>
+    </ProjectsToBuild>
+    </ItemGroup>
+    <Target Name="BuildProjects" >
+        <Message Text="Start to Build $(MSBuildThisFileDirectory)$(ProjectFullName)" Importance="high"/>
+        <MSBuild Projects="@(ProjectsToBuild)" />
+    </Target>
+    <Target Name="IncludeReferenceDll" AfterTargets="BuildProjects">
+        <ItemGroup>
+            <ReferenceDlls Include="$(OutputRoot)\Bin\*.dll"/>
+        </ItemGroup>
+        <Message Text="Include  reference dlls" Importance="high"/>
+        <Copy SourceFiles="@(ReferenceDlls)"
+            DestinationFolder="$(PublishFolder)\Bin\"
+        />
+
+    </Target>
+
+    <!-- <Target Name="AfterWebPublish" AfterTargets="WebPublish">
+        <Message Text="Inside AfterWebPublish" Importance="high"/>
+    </Target> -->
+</Project>
